@@ -1,7 +1,7 @@
 import warnings
 
 warnings.filterwarnings('ignore')
-
+import json
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers.generation.utils import GenerationConfig
@@ -28,7 +28,23 @@ messages.append({"role": "user",
 response = model.chat(tokenizer, messages=messages, stream=True)
 for res in response:
     print(res, end='\r')
-conversation = [('who_are_you', 'i_am'), ('where_you_from', 'i_from'), ('what_you_can', 'i_can')]
+filename = r'/Users/haojingkun/PycharmProjects/llama_tuning/data/bankuai.json'
+conversation = []
+with open(filename, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+    for line in lines:
+        json_data = json.loads(line.strip())
+        history = json_data['history']
+        instruction = json_data['instruction']
+        output = json_data['output']
+        instructions = []
+        outputs = []
+        for his in history:
+            instructions.append(his[0])
+            outputs.append(his[1])
+        instructions.append(instruction)
+        outputs.append(output)
+        conversation.append((instructions, outputs))
 
 ds_train = ds_val = MyDataset(conversation, model, tokenizer)
 dl_train = torch.utils.data.DataLoader(ds_train, num_workers=2, batch_size=4,
@@ -47,7 +63,8 @@ model.config.use_cache = False  # silence the warnings. Please re-enable for inf
 peft_config = LoraConfig(
     task_type=TaskType.CAUSAL_LM, inference_mode=False,
     r=64,
-    lora_alpha=16, lora_dropout=0.05,
+    lora_alpha=16,
+    lora_dropout=0.05,
     target_modules=['up_proj', 'down_proj', 'o_proj', 'gate_proj', 'W_pack']
 )
 

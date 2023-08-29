@@ -3,3 +3,7 @@ datasets
 accelerate
 peft
 torchkeras
+pillow
+sentencepiece
+matplotlib
+IPython

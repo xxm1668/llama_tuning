@@ -7,7 +7,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers.generation.utils import GenerationConfig
 from mydatasets import MyDataset
 from my_data_collator import data_collator
-from peft import get_peft_config, get_peft_model, TaskType
+from peft import get_peft_model, TaskType
 from peft import LoraConfig
 from torchkeras import KerasModel
 from models import StepRunner
@@ -53,9 +53,7 @@ dl_train = torch.utils.data.DataLoader(ds_train, num_workers=2, batch_size=4,
 dl_val = torch.utils.data.DataLoader(ds_val, num_workers=2, batch_size=4,
                                      pin_memory=True, shuffle=False,
                                      collate_fn=data_collator)
-for batch in dl_train:
-    out = model(**batch)
-    print(out.loss)
+
 model.supports_gradient_checkpointing = True  #
 model.gradient_checkpointing_enable()
 model.enable_input_require_grads()

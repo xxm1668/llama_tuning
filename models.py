@@ -44,3 +44,12 @@ class StepRunner:
             else:
                 step_metrics['lr'] = 0.0
         return step_losses, step_metrics
+
+    # 仅仅保存lora可训练参数
+    def save_ckpt(self, ckpt_path='checkpoint.pt', accelerator=None):
+        unwrap_net = accelerator.unwrap_model(self.net)
+        unwrap_net.save_pretrained(ckpt_path)
+
+    def load_ckpt(self, ckpt_path='checkpoint.pt'):
+        self.net = self.net.from_pretrained(self.net, ckpt_path)
+        self.from_scratch = False

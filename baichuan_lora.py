@@ -73,21 +73,8 @@ peft_model.model_parallel = True
 peft_model.print_trainable_parameters()
 KerasModel.StepRunner = StepRunner
 
-
-# 仅仅保存QLoRA的可训练参数
-def save_ckpt(self, ckpt_path='checkpoint', accelerator=None):
-    unwrap_net = accelerator.unwrap_model(self.net)
-    unwrap_net.save_pretrained(ckpt_path)
-
-
-def load_ckpt(self, ckpt_path='checkpoint'):
-    self.net = self.net.from_pretrained(self.net.base_model.model,
-                                        ckpt_path, is_trainable=True)
-    self.from_scratch = False
-
-
-KerasModel.save_ckpt = save_ckpt
-KerasModel.load_ckpt = load_ckpt
+KerasModel.save_ckpt = StepRunner.save_ckpt
+KerasModel.load_ckpt = StepRunner.load_ckpt
 lr_scheduler = CosineAnnealingLR(torch.optim.AdamW(model.parameters(), lr=5e-4), T_max=10)
 keras_model = KerasModel(model, loss_fn=None,
                          optimizer=torch.optim.AdamW(model.parameters(), lr=5e-4), lr_scheduler=lr_scheduler)

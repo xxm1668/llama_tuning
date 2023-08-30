@@ -4,10 +4,9 @@ import random
 
 # 准备数据
 def get_messages(conversation):
-    select = random.choice
     messages, history = [], []
     for t in conversation:
-        history.append((select(t[0]), select(t[-1])))
+        history.append((t[0], t[1]))
 
     for prompt, response in history:
         pair = [{"role": "user", "content": prompt},
@@ -85,3 +84,10 @@ class MyDataset(Dataset):
         messages = self.get(index)
         input_ids, labels = build_chat_input(messages, self.model, self.tokenizer)
         return {'input_ids': input_ids, 'labels': labels}
+
+
+if __name__ == '__main__':
+    conversion = [(['请介绍一下你自己。', '你是谁呀？', '你是？', ], [
+        '我叫梦中情炉，是一个三好炼丹炉：好看，好用，好改。我的英文名字叫做torchkeras，是一个pytorch模型训练模版工具。'])]
+    result = get_messages(conversion)
+    print('------')
